@@ -1,7 +1,11 @@
 package miage.dlafaire.tp3
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -15,6 +19,22 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         val rollButton: Button = findViewById(R.id.button)
+        val targetNumberEditText: EditText = findViewById(R.id.targetNumber)
+
+        rollButton.visibility = View.GONE
+
+        targetNumberEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                rollButton.visibility = if (!s.isNullOrEmpty() && s.toString().toIntOrNull() != null) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
 
         rollButton.setOnClickListener {
             rollDice()
@@ -38,8 +58,18 @@ class MainActivity : AppCompatActivity() {
         resultTextView1.text = diceRoll1.toString()
         resultTextView2.text = diceRoll2.toString()
 
-        if (diceRoll1 == diceRoll2) {
-            Toast.makeText(this, "Félicitations! Tu as eu les mêmes numéros.", Toast.LENGTH_SHORT).show()
+        val targetNumberEditText: EditText = findViewById(R.id.targetNumber)
+        val targetNumber = targetNumberEditText.text.toString().toIntOrNull()
+
+        if (targetNumber != null) {
+            val sum = diceRoll1 + diceRoll2
+            if (sum == targetNumber) {
+                Toast.makeText(this, "Félicitations, vous avez gagné", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Essayez encore", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(this, "Entrez un nombre valide", Toast.LENGTH_SHORT).show()
         }
     }
 }
